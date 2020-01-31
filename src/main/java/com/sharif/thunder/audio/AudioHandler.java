@@ -376,7 +376,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
   }
 
   @Override
-  public ByteBuffer provide20MsAudio() {
+  public byte[] provide20MsAudio() {
     return frame.getData();
   }
 
