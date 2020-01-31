@@ -32,7 +32,9 @@ import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
-import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
+import com.sedmelluq.discord.lavaplayer.track.playback.MutableAudioFrame;
+import com.sedmelluq.discord.lavaplayer.format.AudioDataFormat;
+import com.sedmelluq.discord.lavaplayer.format.StandardAudioDataFormats;
 import com.sharif.thunder.Main;
 import com.sharif.thunder.queue.FairQueue;
 import com.sharif.thunder.utils.FormatUtil;
@@ -61,7 +63,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
   private final PlayerManager manager;
   private final long guildId;
   private Guild guild;
-  private AudioFrame lastFrame;
+  private final MutableAudioFrame frame;
   @Getter
   @Setter
   private long announcingChannel;
@@ -111,6 +113,10 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
     this.guildId = guild.getIdLong();
     this.guild = guild;
     this.audioPlayer = player;
+    this.frame = new MutableAudioFrame();
+    AudioDataFormat format = StandardAudioDataFormats.DISCORD_OPUS;
+    frame.setBuffer(ByteBuffer.allocate(format.maximumChunkSize()));
+    frame.setFormat(format);
   }
 
   public void seek(long position) {
@@ -366,16 +372,12 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
   // Audio send handler methods
   @Override
   public boolean canProvide() {
-    if (lastFrame == null) lastFrame = audioPlayer.provide();
-    return lastFrame != null;
+    return audioPlayer.provide(frame);
   }
 
   @Override
   public ByteBuffer provide20MsAudio() {
-    if (lastFrame == null) lastFrame = audioPlayer.provide();
-    byte[] data = lastFrame != null ? lastFrame.getData() : null;
-    lastFrame = null;
-    return ByteBuffer.wrap(data);
+    return frame.getData();
   }
 
   @Override
