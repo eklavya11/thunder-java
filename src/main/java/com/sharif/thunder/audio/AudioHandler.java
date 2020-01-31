@@ -191,8 +191,10 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
         if (!manager.getBot().getConfig().getStay()) guild.getAudioManager().closeAudioConnection();
       }
     } else {
-      QueuedTrack qt = queue.pull();
-      player.playTrack(qt.getTrack());
+      if (endReason.mayStartNext) {
+        QueuedTrack qt = queue.pull();
+        player.playTrack(qt.getTrack());
+      } // else do nothing
     }
   }
 
