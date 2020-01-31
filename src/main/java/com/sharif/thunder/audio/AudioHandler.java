@@ -60,7 +60,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
   static AudioConfiguration configuration;
   private final PlayerManager manager;
   private final long guildId;
-  private final AudioFrame lastFrame;
+  private AudioFrame lastFrame;
   private final Guild guild;
   @Getter
   @Setter
