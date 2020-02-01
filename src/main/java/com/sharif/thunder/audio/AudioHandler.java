@@ -59,9 +59,10 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
   private final Set<String> votes = new HashSet<>();
   static AudioConfiguration configuration;
   private final PlayerManager manager;
-  private final long guildId;
   private AudioFrame lastFrame;
   private final Guild guild;
+  private CompletableFuture<Void> task;
+
   @Getter
   @Setter
   private long announcingChannel;
@@ -90,9 +91,6 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
   @Getter 
   @Setter 
   private float karaokeBand = 220f;
-  private static final float[] BASS_BOOST = {
-    0.2f, 0.15f, 0.1f, 0.05f, 0.0f, -0.05f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f
-  };
   @Getter
   @Setter 
   private boolean bassboost = false;
@@ -101,14 +99,12 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
   private int pitch = 0;
   @Getter 
   @Setter private float tempo = 1.0f;
-  private CompletableFuture<Void> task;
-
+  private static final float[] BASS_BOOST = {0.2f, 0.15f, 0.1f, 0.05f, 0.0f, -0.05f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f, -0.1f};
   @SerializedName("high-quality-nightcore")
   public boolean highQualityNightcore = false;
 
   protected AudioHandler(PlayerManager manager, Guild guild, AudioPlayer player) {
     this.manager = manager;
-    this.guildId = guild.getIdLong();
     this.guild = guild;
     this.audioPlayer = player;
   }
@@ -360,7 +356,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler 
   }
 
   private Guild guild(JDA jda) {
-    return jda.getGuildById(guildId);
+    return jda.getGuildById(guild.getIdLong());
   }
 
   // Audio send handler methods
